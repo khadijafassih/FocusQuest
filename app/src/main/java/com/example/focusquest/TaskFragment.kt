@@ -95,12 +95,33 @@ class TaskFragment : Fragment() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerFilter.adapter = adapter
 
+        binding.chipAll.setOnClickListener {
+            binding.spinnerFilter.setSelection(0)
+        }
+
+        binding.chipPending.setOnClickListener {
+            binding.spinnerFilter.setSelection(1)
+        }
+
+        binding.chipCompleted.setOnClickListener {
+            binding.spinnerFilter.setSelection(2)
+        }
+
         binding.spinnerFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                updateFilterChips(position)
                 applyFilters()
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+
+        updateFilterChips(0)
+    }
+
+    private fun updateFilterChips(position: Int) {
+        binding.chipAll.isSelected = position == 0
+        binding.chipPending.isSelected = position == 1
+        binding.chipCompleted.isSelected = position == 2
     }
 
     private fun applyFilters() {

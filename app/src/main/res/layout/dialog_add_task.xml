@@ -3,25 +3,70 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingStart="20dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create New Task"
+        android:textColor="@color/text_primary"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Add a mission and choose its category"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Task Title"
+        android:textColor="@color/text_primary"
+        android:textSize="13sp"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/etTaskTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Task Title"
-        android:inputType="textCapSentences" />
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_dialog_input"
+        android:hint="e.g. Finish weekly report"
+        android:inputType="textCapSentences"
+        android:paddingStart="14dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="12dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/bottom_nav_inactive"
+        android:textSize="14sp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Category:"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="14dp"
+        android:text="Category"
+        android:textColor="@color/text_primary"
+        android:textSize="13sp"
+        android:textStyle="bold" />
 
     <Spinner
         android:id="@+id/spinnerCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_dialog_spinner"
+        android:paddingStart="12dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="10dp" />
 
 </LinearLayout>

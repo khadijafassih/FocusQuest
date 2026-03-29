@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.example.focusquest.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+    private var quotePageCallback: ViewPager2.OnPageChangeCallback? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,6 +27,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         updateUI()
         setupQuickActions()
+        setupQuoteSlider()
     }
 
     private fun setupQuickActions() {
@@ -53,7 +56,29 @@ class HomeFragment : Fragment() {
         binding.tvXPLabel.text = "$progress / 100\nXP"
     }
 
+    private fun setupQuoteSlider() {
+        val slides = listOf(
+            QuoteSlide("The best time to focus is now.", R.drawable.quote_nature_1),
+            QuoteSlide("Small progress every day adds up.", R.drawable.quote_nature_2),
+            QuoteSlide("Discipline turns goals into reality.", R.drawable.quote_nature_3),
+            QuoteSlide("One session at a time, one level higher.", R.drawable.quote_nature_4),
+            QuoteSlide("Breathe, focus, and move forward.", R.drawable.quote_nature_5)
+        )
+
+        binding.viewPagerQuotes.adapter = QuoteSliderAdapter(slides)
+        binding.tvQuotePage.text = "1/${slides.size}"
+
+        quotePageCallback = object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                binding.tvQuotePage.text = "${position + 1}/${slides.size}"
+            }
+        }
+        binding.viewPagerQuotes.registerOnPageChangeCallback(quotePageCallback!!)
+    }
+
     override fun onDestroyView() {
+        quotePageCallback?.let { binding.viewPagerQuotes.unregisterOnPageChangeCallback(it) }
+        quotePageCallback = null
         super.onDestroyView()
         _binding = null
     }

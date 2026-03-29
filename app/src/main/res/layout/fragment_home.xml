@@ -32,11 +32,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            app:cardBackgroundColor="@color/surface"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="4dp"
-            app:strokeColor="@color/card_stroke"
-            app:strokeWidth="1dp">
+            app:cardBackgroundColor="#F2F1F3"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -51,25 +50,36 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_level_chip"
-                        android:paddingStart="10dp"
-                        android:paddingTop="4dp"
-                        android:paddingEnd="10dp"
-                        android:paddingBottom="4dp"
-                        android:text="LEVEL"
-                        android:textColor="@color/primary"
-                        android:textSize="11sp"
+                        android:id="@+id/tvLevel"
+                        android:layout_width="95dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/bg_card_add_task"
+                        android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:text="LEVEL\n1"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/tvLevel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:lineSpacingExtra="1dp"
+                        android:text="Productivity\nMage"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvXPLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Level: 1"
-                        android:textColor="@color/text_primary"
+                        android:gravity="end"
+                        android:lineSpacingExtra="1dp"
+                        android:text="0 / 100\nXP"
+                        android:textColor="#E043A2"
                         android:textSize="16sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -78,37 +88,11 @@
                     android:id="@+id/pbXP"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_height="16dp"
+                    android:layout_marginTop="18dp"
                     android:max="100"
                     android:progress="0"
-                    android:progressTint="@color/progress_fill"
-                    android:progressBackgroundTint="@color/progress_track" />
-
-                <TextView
-                    android:id="@+id/tvXPLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="0 / 100 XP"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Keep going. Complete tasks and sessions to level up faster."
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
+                    android:progressDrawable="@drawable/bg_home_xp_progress" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -121,26 +105,40 @@
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
             app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="4dp">
+            app:cardCornerRadius="34dp"
+            app:cardElevation="6dp">
 
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="170dp"
                 android:background="@drawable/bg_card_add_task"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="22dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:layout_gravity="start|top"
+                    android:orientation="vertical"
+                    android:paddingEnd="86dp">
+
+                    <FrameLayout
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:background="@drawable/bg_white_circle">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@android:drawable/ic_input_add"
+                            android:tint="#DE4D96" />
+                    </FrameLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
                         android:text="Add Task"
                         android:textColor="@android:color/white"
                         android:textSize="20sp"
@@ -149,18 +147,21 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Create your next mission from the Tasks tab"
-                        android:textColor="#EFFFFFFF"
-                        android:textSize="13sp" />
+                        android:layout_marginTop="4dp"
+                        android:text="Declare a new mission for today"
+                        android:textColor="#DFFFFFFF"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@android:drawable/ic_media_next"
+                    android:layout_width="104dp"
+                    android:layout_height="104dp"
+                    android:layout_gravity="end|bottom"
+                    android:alpha="0.14"
+                    android:src="@android:drawable/ic_menu_agenda"
                     android:tint="@android:color/white" />
-            </LinearLayout>
+            </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
@@ -172,26 +173,33 @@
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
             app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="4dp">
+            app:cardCornerRadius="34dp"
+            app:cardElevation="6dp">
 
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="170dp"
                 android:background="@drawable/bg_card_focus"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="22dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:layout_gravity="start|top"
+                    android:orientation="vertical"
+                    android:paddingEnd="86dp">
+
+                    <ImageView
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:src="@android:drawable/ic_lock_idle_alarm"
+                        android:tint="@android:color/white" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
                         android:text="Start Focus Session"
                         android:textColor="@android:color/white"
                         android:textSize="20sp"
@@ -200,18 +208,21 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Enter the Timer tab to begin a 25-minute sprint"
-                        android:textColor="#EFFFFFFF"
-                        android:textSize="13sp" />
+                        android:layout_marginTop="4dp"
+                        android:text="Enter the flow state now"
+                        android:textColor="#DFFFFFFF"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@android:drawable/ic_media_next"
+                    android:layout_width="112dp"
+                    android:layout_height="112dp"
+                    android:layout_gravity="end|bottom"
+                    android:alpha="0.12"
+                    android:src="@android:drawable/ic_lock_idle_charging"
                     android:tint="@android:color/white" />
-            </LinearLayout>
+            </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout

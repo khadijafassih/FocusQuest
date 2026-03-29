@@ -48,9 +48,9 @@ class HomeFragment : Fragment() {
         val level = (xp / 100) + 1
         val progress = xp % 100
 
-        binding.tvLevel.text = "Level: $level"
+        binding.tvLevel.text = "LEVEL\n$level"
         binding.pbXP.progress = progress
-        binding.tvXPLabel.text = "$progress / 100 XP"
+        binding.tvXPLabel.text = "$progress / 100\nXP"
     }
 
     override fun onDestroyView() {

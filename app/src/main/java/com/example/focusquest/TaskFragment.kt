@@ -54,8 +54,11 @@ class TaskFragment : Fragment() {
             onTaskChecked = { task, isChecked ->
                 task.isCompleted = isChecked
                 if (isChecked) {
-                    addXP(task.xpReward)
+                    updateXP(task.xpReward)
                     Toast.makeText(context, "+${task.xpReward} XP Earned! 🎉", Toast.LENGTH_SHORT).show()
+                } else {
+                    updateXP(-task.xpReward)
+                    Toast.makeText(context, "-${task.xpReward} XP Removed", Toast.LENGTH_SHORT).show()
                 }
                 saveTasks()
                 applyFilters()
@@ -179,10 +182,11 @@ class TaskFragment : Fragment() {
             .show()
     }
 
-    private fun addXP(amount: Int) {
+    private fun updateXP(amount: Int) {
         val prefs = requireContext().getSharedPreferences("FocusQuestPrefs", Context.MODE_PRIVATE)
         val currentXP = prefs.getInt("XP", 0)
-        prefs.edit().putInt("XP", currentXP + amount).apply()
+        val updatedXP = (currentXP + amount).coerceAtLeast(0)
+        prefs.edit().putInt("XP", updatedXP).apply()
     }
 
     private fun saveTasks() {

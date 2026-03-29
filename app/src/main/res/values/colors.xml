@@ -3,21 +3,21 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="primary">#7A4BDD</color>
-    <color name="primary_dark">#6638C8</color>
+    <color name="primary">#2563EB</color>
+    <color name="primary_dark">#1D4ED8</color>
     <color name="on_primary">#FFFFFF</color>
 
-    <color name="screen_background">#F7F3FB</color>
+    <color name="screen_background">#F4F9FF</color>
     <color name="surface">#FFFFFF</color>
-    <color name="card_stroke">#ECE6FA</color>
+    <color name="card_stroke">#DCE8F5</color>
 
-    <color name="text_primary">#312B3F</color>
-    <color name="text_secondary">#7D7591</color>
+    <color name="text_primary">#1E2B37</color>
+    <color name="text_secondary">#5F7488</color>
 
-    <color name="progress_fill">#E85FB9</color>
-    <color name="progress_track">#E9E2F7</color>
+    <color name="progress_fill">#F45D8C</color>
+    <color name="progress_track">#DCE8F5</color>
 
-    <color name="bottom_nav_active">#7A4BDD</color>
-    <color name="bottom_nav_inactive">#A6A0B6</color>
-    <color name="bottom_nav_active_bg">#EEE6FF</color>
+    <color name="bottom_nav_active">#2563EB</color>
+    <color name="bottom_nav_inactive">#8BA2B6</color>
+    <color name="bottom_nav_active_bg">#E5F0FF</color>
 </resources>

@@ -10,13 +10,13 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/screen_background">
+        android:background="@drawable/bg_screen_gradient">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary"
+            android:background="@drawable/bg_toolbar_gradient"
             android:elevation="0dp"
             app:layout_constraintTop_toTopOf="parent"
             app:titleTextColor="@android:color/white" />
@@ -34,11 +34,11 @@
             android:id="@+id/bottomNavigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginBottom="12dp"
             android:background="@drawable/bg_bottom_nav"
-            android:elevation="8dp"
+            android:elevation="10dp"
             app:itemIconTint="@color/bottom_nav_item_colors"
             app:itemTextColor="@color/bottom_nav_item_colors"
             app:labelVisibilityMode="labeled"

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_background"
+    android:background="@drawable/bg_screen_gradient"
     android:fillViewport="true">
 
     <LinearLayout
@@ -36,7 +36,7 @@
             android:layout_marginTop="12dp"
             android:text="Focus Timer"
             android:textColor="@color/text_primary"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:textStyle="bold" />
 
         <TextView
@@ -98,8 +98,8 @@
             android:layout_marginStart="2dp"
             android:layout_marginEnd="2dp"
             app:cardBackgroundColor="@color/surface"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="3dp"
             app:strokeColor="@color/card_stroke"
             app:strokeWidth="1dp">
 
@@ -191,13 +191,12 @@
             android:layout_marginTop="12dp"
             android:text="Test Pomodoro"
             android:textAllCaps="false"
-            android:textColor="@color/text_primary"
+            android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:backgroundTint="@color/surface"
+            app:backgroundTint="@color/primary"
             app:cornerRadius="26dp"
-            app:strokeColor="@color/card_stroke"
-            app:strokeWidth="1dp" />
+            app:strokeWidth="0dp" />
 
         <TextView
             android:layout_width="wrap_content"

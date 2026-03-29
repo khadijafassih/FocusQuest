@@ -22,6 +22,7 @@ class TimerFragment : Fragment() {
     private var countDownTimer: CountDownTimer? = null
     private var timeLeftInMillis: Long = 1500000 // 25 minutes
     private var timerRunning = false
+    private var isTestPomodoroRunning = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,6 +47,14 @@ class TimerFragment : Fragment() {
             resetTimer()
         }
 
+        binding.btnTestPomodoro.setOnClickListener {
+            if (isTestPomodoroRunning) {
+                endTestPomodoro()
+            } else {
+                startTestPomodoro()
+            }
+        }
+
         updateCountDownText()
     }
 
@@ -60,9 +69,17 @@ class TimerFragment : Fragment() {
             override fun onFinish() {
                 timerRunning = false
                 binding.btnStartPause.text = "Start"
-                addXP(20)
-                sendNotification()
-                Toast.makeText(context, "Focus session complete! +20 XP 🎉", Toast.LENGTH_LONG).show()
+                if (isTestPomodoroRunning) {
+                    isTestPomodoroRunning = false
+                    setTestButtonState(false)
+                    addXP(10)
+                    sendNotification(10)
+                    Toast.makeText(context, "Test Pomodoro complete! +10 XP 🎉", Toast.LENGTH_LONG).show()
+                } else {
+                    addXP(20)
+                    sendNotification(20)
+                    Toast.makeText(context, "Focus session complete! +20 XP 🎉", Toast.LENGTH_LONG).show()
+                }
                 resetTimer()
             }
         }.start()
@@ -97,13 +114,46 @@ class TimerFragment : Fragment() {
         binding.pbTimer.progress = (timeLeftInMillis / 1000).toInt()
     }
 
+    private fun startTestPomodoro() {
+        if (timerRunning) {
+            countDownTimer?.cancel()
+        }
+        resetTimer()
+        isTestPomodoroRunning = true
+        setTestButtonState(true)
+        startTimer()
+        Toast.makeText(context, "Test Pomodoro started", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun endTestPomodoro() {
+        if (!isTestPomodoroRunning) return
+
+        countDownTimer?.cancel()
+        timerRunning = false
+        isTestPomodoroRunning = false
+        setTestButtonState(false)
+        addXP(10)
+        Toast.makeText(context, "Test Pomodoro ended! +10 XP", Toast.LENGTH_LONG).show()
+        resetTimer()
+    }
+
+    private fun setTestButtonState(isRunning: Boolean) {
+        if (isRunning) {
+            binding.btnTestPomodoro.text = "End Test Pomodoro (+10 XP)"
+        } else {
+            binding.btnTestPomodoro.text = "Test Pomodoro"
+        }
+        binding.btnStartPause.isEnabled = !isRunning
+        binding.btnReset.isEnabled = !isRunning
+    }
+
     private fun addXP(amount: Int) {
         val prefs = requireContext().getSharedPreferences("FocusQuestPrefs", Context.MODE_PRIVATE)
         val currentXP = prefs.getInt("XP", 0)
         prefs.edit().putInt("XP", currentXP + amount).apply()
     }
 
-    private fun sendNotification() {
+    private fun sendNotification(xpEarned: Int) {
         val context = requireContext()
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "focus_quest_timer"
@@ -116,7 +166,7 @@ class TimerFragment : Fragment() {
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle("Focus Session Complete!")
-            .setContentText("Well done! You earned +20 XP.")
+            .setContentText("Well done! You earned +${xpEarned} XP.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 

@@ -1,5 +1,9 @@
 package com.example.focusquest
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
@@ -13,6 +17,27 @@ import com.google.android.material.navigation.NavigationView
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
+
+    private val systemReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Intent.ACTION_BATTERY_LOW -> {
+                    Toast.makeText(context, "Battery Low! Please charge your phone!", Toast.LENGTH_LONG).show()
+                }
+                Intent.ACTION_POWER_CONNECTED -> {
+                    Toast.makeText(context, "Power Connected! Charging... ⚡", Toast.LENGTH_SHORT).show()
+                }
+                Intent.ACTION_POWER_DISCONNECTED -> {
+                    Toast.makeText(context, "Power Disconnected", Toast.LENGTH_SHORT).show()
+                }
+                Intent.ACTION_AIRPLANE_MODE_CHANGED -> {
+                    val isAirplaneModeOn = intent.getBooleanExtra("state", false)
+                    val message = if (isAirplaneModeOn) "Airplane Mode ON ✈️" else "Airplane Mode OFF"
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +70,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             replaceFragment(HomeFragment())
             binding.bottomNavigation.selectedItemId = R.id.nav_home
         }
+
+        // Register system broadcast receiver
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_BATTERY_LOW)
+            addAction(Intent.ACTION_POWER_CONNECTED)
+            addAction(Intent.ACTION_POWER_DISCONNECTED)
+            addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
+        }
+        registerReceiver(systemReceiver, filter)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(systemReceiver)
     }
 
     private fun replaceFragment(fragment: Fragment) {

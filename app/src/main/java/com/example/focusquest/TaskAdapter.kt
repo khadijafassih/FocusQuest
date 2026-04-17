@@ -2,13 +2,13 @@ package com.example.focusquest
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.example.focusquest.databinding.ItemTaskBinding
 
 class TaskAdapter(
     private var tasks: List<Task>,
     private val onTaskChecked: (Task, Boolean) -> Unit,
+    private val onTaskEdit: (Task) -> Unit,
     private val onTaskDelete: (Task) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
@@ -33,6 +33,10 @@ class TaskAdapter(
         }
 
         holder.binding.tvTaskTitle.alpha = if (task.isCompleted) 0.5f else 1.0f
+
+        holder.binding.root.setOnClickListener {
+            onTaskEdit(task)
+        }
 
         holder.binding.root.setOnLongClickListener {
             onTaskDelete(task)

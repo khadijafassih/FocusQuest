@@ -44,7 +44,7 @@ class TaskFragment : Fragment() {
         setupSearch()
 
         binding.fabAddTask.setOnClickListener {
-            showAddTaskDialog()
+            showTaskDialog(null)
         }
     }
 
@@ -55,13 +55,16 @@ class TaskFragment : Fragment() {
                 task.isCompleted = isChecked
                 if (isChecked) {
                     updateXP(task.xpReward)
-                    Toast.makeText(context, "+${task.xpReward} XP Earned! 🎉", Toast.LENGTH_SHORT).show()
+                     Toast.makeText(context, "+${task.xpReward} XP Earned! 🎉", Toast.LENGTH_SHORT).show()
                 } else {
                     updateXP(-task.xpReward)
                     Toast.makeText(context, "-${task.xpReward} XP Removed", Toast.LENGTH_SHORT).show()
                 }
                 saveTasks()
                 applyFilters()
+            },
+            onTaskEdit = { task ->
+                showTaskDialog(task)
             },
             onTaskDelete = { task ->
                 AlertDialog.Builder(requireContext())
@@ -145,22 +148,31 @@ class TaskFragment : Fragment() {
         taskAdapter.updateTasks(filteredTasks.toList())
     }
 
-    private fun showAddTaskDialog() {
+    private fun showTaskDialog(taskToEdit: Task?) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_task, null)
         val etTitle = dialogView.findViewById<EditText>(R.id.etTaskTitle)
         val spinnerCategory = dialogView.findViewById<Spinner>(R.id.spinnerCategory)
 
         val categories = arrayOf("Study", "Work", "Personal")
-        spinnerCategory.adapter = ArrayAdapter(
+        val spinnerAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
             categories
         )
+        spinnerCategory.adapter = spinnerAdapter
+
+        if (taskToEdit != null) {
+            etTitle.setText(taskToEdit.title)
+            val categoryPosition = categories.indexOf(taskToEdit.category)
+            if (categoryPosition >= 0) {
+                spinnerCategory.setSelection(categoryPosition)
+            }
+        }
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Add New Task")
+            .setTitle(if (taskToEdit == null) "Add New Task" else "Edit Task")
             .setView(dialogView)
-            .setPositiveButton("Add") { _, _ ->
+            .setPositiveButton(if (taskToEdit == null) "Add" else "Update") { _, _ ->
                 val title = etTitle.text.toString().trim()
                 if (title.isNotEmpty()) {
                     val category = spinnerCategory.selectedItem.toString()
@@ -169,11 +181,20 @@ class TaskFragment : Fragment() {
                         "Work" -> 15
                         else -> 10
                     }
-                    val newTask = Task(title = title, category = category, xpReward = xp)
-                    allTasks.add(newTask)
+                    
+                    if (taskToEdit == null) {
+                        val newTask = Task(title = title, category = category, xpReward = xp)
+                        allTasks.add(newTask)
+                        Toast.makeText(context, "Task Added ✅", Toast.LENGTH_SHORT).show()
+                    } else {
+                        taskToEdit.title = title
+                        taskToEdit.category = category
+                        // Note: xpReward is val in Task.kt, so it won't change on edit unless changed to var
+                        Toast.makeText(context, "Task Updated", Toast.LENGTH_SHORT).show()
+                    }
+                    
                     saveTasks()
                     applyFilters()
-                    Toast.makeText(context, "Task Added ✅", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(context, "Title cannot be empty", Toast.LENGTH_SHORT).show()
                 }

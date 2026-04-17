@@ -9,5 +9,5 @@ data class Task(
     var title: String,
     var category: String,
     var isCompleted: Boolean = false,
-    val xpReward: Int = 10
+    var xpReward: Int = 10
 ) : Parcelable

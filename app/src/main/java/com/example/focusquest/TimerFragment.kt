@@ -18,6 +18,7 @@ import com.example.focusquest.databinding.FragmentTimerBinding
 class TimerFragment : Fragment() {
     private var _binding: FragmentTimerBinding? = null
     private val binding get() = _binding!!
+    private lateinit var userPrefs: UserPreferencesManager
 
     private var countDownTimer: CountDownTimer? = null
     private var timeLeftInMillis: Long = 1500000 // 25 minutes
@@ -34,6 +35,7 @@ class TimerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        userPrefs = UserPreferencesManager(requireContext())
 
         binding.btnStartPause.setOnClickListener {
             if (timerRunning) {
@@ -148,9 +150,7 @@ class TimerFragment : Fragment() {
     }
 
     private fun addXP(amount: Int) {
-        val prefs = requireContext().getSharedPreferences("FocusQuestPrefs", Context.MODE_PRIVATE)
-        val currentXP = prefs.getInt("XP", 0)
-        prefs.edit().putInt("XP", currentXP + amount).apply()
+        userPrefs.updateUserXP(amount)
     }
 
     private fun sendNotification(xpEarned: Int) {

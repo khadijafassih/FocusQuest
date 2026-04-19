@@ -1,6 +1,5 @@
 package com.example.focusquest
 
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -24,6 +23,7 @@ class TaskFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var taskAdapter: TaskAdapter
+    private lateinit var userPrefs: UserPreferencesManager
     private var allTasks = mutableListOf<Task>()
     private var filteredTasks = mutableListOf<Task>()
 
@@ -38,6 +38,7 @@ class TaskFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        userPrefs = UserPreferencesManager(requireContext())
         loadTasks()
         setupFilter()
         setupRecyclerView()
@@ -204,24 +205,31 @@ class TaskFragment : Fragment() {
     }
 
     private fun updateXP(amount: Int) {
-        val prefs = requireContext().getSharedPreferences("FocusQuestPrefs", Context.MODE_PRIVATE)
-        val currentXP = prefs.getInt("XP", 0)
-        val updatedXP = (currentXP + amount).coerceAtLeast(0)
-        prefs.edit().putInt("XP", updatedXP).apply()
+        val currentUser = userPrefs.getCurrentUser()
+        if (currentUser != null) {
+            val newXP = (currentUser.xp + amount).coerceAtLeast(0)
+            currentUser.xp = newXP
+            currentUser.level = (newXP / 100) + 1
+            userPrefs.updateUserXP(amount)
+        }
     }
 
     private fun saveTasks() {
-        val prefs = requireContext().getSharedPreferences("FocusQuestPrefs", Context.MODE_PRIVATE)
+        val prefs = requireContext().getSharedPreferences("FocusQuestAuth", android.content.Context.MODE_PRIVATE)
+        val tasksKey = userPrefs.getCurrentUserTasksKey()
         val json = Gson().toJson(allTasks)
-        prefs.edit().putString("Tasks", json).apply()
+        prefs.edit().putString(tasksKey, json).apply()
     }
 
     private fun loadTasks() {
-        val prefs = requireContext().getSharedPreferences("FocusQuestPrefs", Context.MODE_PRIVATE)
-        val json = prefs.getString("Tasks", null)
+        val prefs = requireContext().getSharedPreferences("FocusQuestAuth", android.content.Context.MODE_PRIVATE)
+        val tasksKey = userPrefs.getCurrentUserTasksKey()
+        val json = prefs.getString(tasksKey, null)
         if (json != null) {
             val type = object : TypeToken<MutableList<Task>>() {}.type
             allTasks = Gson().fromJson(json, type)
+        } else {
+            allTasks = mutableListOf()
         }
     }
 

@@ -14,6 +14,7 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private var quotePageCallback: ViewPager2.OnPageChangeCallback? = null
+    private lateinit var userPrefs: UserPreferencesManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,6 +26,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        userPrefs = UserPreferencesManager(requireContext())
         updateUI()
         setupQuickActions()
         setupQuoteSlider()
@@ -46,14 +48,15 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateUI() {
-        val prefs = requireContext().getSharedPreferences("FocusQuestPrefs", Context.MODE_PRIVATE)
-        val xp = prefs.getInt("XP", 0)
-        val level = (xp / 100) + 1
-        val progress = xp % 100
+        val currentUser = userPrefs.getCurrentUser()
+        if (currentUser != null) {
+            val level = currentUser.level
+            val progress = currentUser.xp % 100
 
-        binding.tvLevel.text = "LEVEL\n$level"
-        binding.pbXP.progress = progress
-        binding.tvXPLabel.text = "$progress / 100\nXP"
+            binding.tvLevel.text = "LEVEL\n$level"
+            binding.pbXP.progress = progress
+            binding.tvXPLabel.text = "$progress / 100\nXP"
+        }
     }
 
     private fun setupQuoteSlider() {
@@ -74,6 +77,11 @@ class HomeFragment : Fragment() {
             }
         }
         binding.viewPagerQuotes.registerOnPageChangeCallback(quotePageCallback!!)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateUI()
     }
 
     override fun onDestroyView() {

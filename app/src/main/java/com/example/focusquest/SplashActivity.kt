@@ -11,9 +11,16 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        // 2-3 seconds delay then move to MainActivity
+        val userPrefs = UserPreferencesManager(this)
+        
+        // 2-3 seconds delay then move to appropriate screen
         Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(this, MainActivity::class.java))
+            val nextActivity = if (userPrefs.isLoggedIn()) {
+                MainActivity::class.java
+            } else {
+                SignInActivity::class.java
+            }
+            startActivity(Intent(this, nextActivity))
             finish()
         }, 2000)
     }

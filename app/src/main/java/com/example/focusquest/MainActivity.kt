@@ -17,6 +17,7 @@ import com.google.android.material.navigation.NavigationView
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var userPrefs: UserPreferencesManager
 
     private val systemReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -43,6 +44,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        userPrefs = UserPreferencesManager(this)
 
         setSupportActionBar(binding.toolbar)
 
@@ -110,8 +113,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 replaceFragment(ProfileFragment())
                 binding.bottomNavigation.selectedItemId = R.id.nav_profile
             }
-            R.id.nav_reset -> {
-                resetData()
+            R.id.nav_logout -> {
+                logoutUser()
             }
             R.id.nav_about -> {
                 Toast.makeText(this, "FocusQuest v1.0", Toast.LENGTH_SHORT).show()
@@ -121,11 +124,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    private fun resetData() {
-        val prefs = getSharedPreferences("FocusQuestPrefs", MODE_PRIVATE)
-        prefs.edit().clear().apply()
-        Toast.makeText(this, "Data Reset", Toast.LENGTH_SHORT).show()
-        replaceFragment(HomeFragment())
+    private fun logoutUser() {
+        userPrefs.logoutUser()
+        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, SignInActivity::class.java))
+        finish()
     }
 
     override fun onBackPressed() {

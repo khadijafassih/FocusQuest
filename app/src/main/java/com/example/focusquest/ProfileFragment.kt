@@ -1,5 +1,6 @@
 package com.example.focusquest
 
+import android.content.Intent
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -14,11 +15,13 @@ import com.example.focusquest.databinding.FragmentProfileBinding
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
+    private lateinit var userPrefs: UserPreferencesManager
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             binding.ivProfile.setImageURI(it)
-            saveProfileImage(it.toString())
+            userPrefs.updateProfileImage(it.toString())
+            Toast.makeText(context, "Profile photo updated", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -32,6 +35,7 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        userPrefs = UserPreferencesManager(requireContext())
         
         loadProfile()
 
@@ -42,31 +46,42 @@ class ProfileFragment : Fragment() {
         binding.btnResetStats.setOnClickListener {
             resetStats()
         }
-    }
 
-    private fun loadProfile() {
-        val prefs = requireContext().getSharedPreferences("FocusQuestPrefs", Context.MODE_PRIVATE)
-        val xp = prefs.getInt("XP", 0)
-        val level = (xp / 100) + 1
-        val imageUri = prefs.getString("ProfileImage", null)
-
-        binding.tvProfileStats.text = "Level $level | $xp Total XP"
-        
-        imageUri?.let {
-            binding.ivProfile.setImageURI(Uri.parse(it))
+        binding.btnLogout.setOnClickListener {
+            logout()
         }
     }
 
-    private fun saveProfileImage(uriString: String) {
-        val prefs = requireContext().getSharedPreferences("FocusQuestPrefs", Context.MODE_PRIVATE)
-        prefs.edit().putString("ProfileImage", uriString).apply()
+    private fun loadProfile() {
+        val currentUser = userPrefs.getCurrentUser()
+        if (currentUser != null) {
+            binding.tvProfileName.text = currentUser.username
+            binding.tvProfileStats.text = "Level ${currentUser.level} | ${currentUser.xp} Total XP"
+            
+            currentUser.profileImage?.let {
+                binding.ivProfile.setImageURI(Uri.parse(it))
+            }
+        }
     }
 
     private fun resetStats() {
-        val prefs = requireContext().getSharedPreferences("FocusQuestPrefs", Context.MODE_PRIVATE)
-        prefs.edit().putInt("XP", 0).apply()
+        val currentUser = userPrefs.getCurrentUser()
+        if (currentUser != null) {
+            userPrefs.setCurrentUserXP(0)
+            loadProfile()
+            Toast.makeText(context, "Progression Reset", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun logout() {
+        userPrefs.logoutUser()
+        startActivity(Intent(requireContext(), SignInActivity::class.java))
+        activity?.finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
         loadProfile()
-        Toast.makeText(context, "Progression Reset", Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

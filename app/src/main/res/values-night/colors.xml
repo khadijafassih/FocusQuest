@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Background & Surface — warm dark palette -->
+    <color name="screen_background">#0F172A</color>
+    <color name="surface">#1E293B</color>
+    <color name="card_stroke">#334155</color>
+
+    <!-- Text -->
+    <color name="text_primary">#F1F5F9</color>
+    <color name="text_secondary">#94A3B8</color>
+    <color name="text_hint">#64748B</color>
+
+    <!-- Navigation active bg -->
+    <color name="bottom_nav_active_bg">#1E3A5F</color>
+
+    <!-- Primary stays readable in dark -->
+    <color name="primary">#3B82F6</color>
+    <color name="primary_light">#1E3A5F</color>
+
+    <!-- Semantic colours — adjusted for dark contrast -->
+    <color name="success_light">#064E3B</color>
+    <color name="success_dark">#6EE7B7</color>
+    <color name="warning_light">#78350F</color>
+    <color name="error_light">#7F1D1D</color>
+    <color name="accent_pink_light">#500724</color>
+
+    <!-- Progress -->
+    <color name="progress_track">#334155</color>
+    <color name="xp_chip_bg">#3B0A2A</color>
+</resources>

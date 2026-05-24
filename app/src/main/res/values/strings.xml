@@ -2,4 +2,8 @@
     <string name="app_name">FocusQuest</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="channel_timer_name">Focus Timer</string>
+    <string name="channel_timer_desc">Notifications when your focus session completes</string>
+    <string name="notification_session_title">Focus Session Complete!</string>
+    <string name="notification_session_body">Great work! You earned +%d XP.</string>
 </resources>

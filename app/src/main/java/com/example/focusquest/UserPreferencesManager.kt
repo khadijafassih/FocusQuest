@@ -170,4 +170,53 @@ class UserPreferencesManager(context: Context) {
                 .apply()
         }
     }
+
+    /**
+     * Clear current user's profile image when a saved URI becomes invalid
+     */
+    fun clearCurrentUserProfileImage() {
+        val user = getCurrentUser() ?: return
+        user.profileImage = null
+
+        val usersJson = sharedPreferences.getString("all_users", "[]")
+        val userList = gson.fromJson(usersJson, Array<User>::class.java).toMutableList()
+        val index = userList.indexOfFirst { it.username == user.username }
+        if (index >= 0) {
+            userList[index] = user
+        }
+
+        sharedPreferences.edit()
+            .putString("all_users", gson.toJson(userList))
+            .putString(PREF_KEY_USER, gson.toJson(user))
+            .apply()
+    }
+
+    // ── Feature 4: Custom Timer Durations ──────────────────────────────────
+    fun getCustomDuration(type: com.example.focusquest.viewmodel.SessionType): Int? {
+        val key = "custom_duration_${type.name}"
+        val v = sharedPreferences.getInt(key, -1)
+        return if (v == -1) null else v
+    }
+
+    fun setCustomDuration(type: com.example.focusquest.viewmodel.SessionType, minutes: Int) {
+        sharedPreferences.edit().putInt("custom_duration_${type.name}", minutes).apply()
+    }
+
+    // ── Feature 5: Scheduled Reminders ────────────────────────────────────
+    fun getReminderEnabled(): Boolean = sharedPreferences.getBoolean("reminder_enabled", false)
+    fun setReminderEnabled(v: Boolean) = sharedPreferences.edit().putBoolean("reminder_enabled", v).apply()
+    fun getReminderHour(): Int = sharedPreferences.getInt("reminder_hour", 9)
+    fun getReminderMinute(): Int = sharedPreferences.getInt("reminder_minute", 0)
+    fun setReminderTime(hour: Int, minute: Int) = sharedPreferences.edit()
+        .putInt("reminder_hour", hour).putInt("reminder_minute", minute).apply()
+
+    // ── Feature 6: Dark Mode ───────────────────────────────────────────────
+    fun getDarkMode(): Int = sharedPreferences.getInt("dark_mode", 0) // 0=system,1=light,2=dark
+    fun setDarkMode(mode: Int) = sharedPreferences.edit().putInt("dark_mode", mode).apply()
+
+    // ── Feature 8: Onboarding & Daily Goal ───────────────────────────────
+    fun hasSeenOnboarding(): Boolean = sharedPreferences.getBoolean("has_seen_onboarding", false)
+    fun setHasSeenOnboarding(seen: Boolean) = sharedPreferences.edit().putBoolean("has_seen_onboarding", seen).apply()
+    fun getDailyGoal(): Int = sharedPreferences.getInt("daily_goal", 4)
+    fun setDailyGoal(goal: Int) = sharedPreferences.edit().putInt("daily_goal", goal).apply()
 }

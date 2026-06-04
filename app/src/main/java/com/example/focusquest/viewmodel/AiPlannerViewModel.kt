@@ -19,10 +19,13 @@ data class ChatMessage(val text: String, val isUser: Boolean)
 
 data class AiTask(val title: String, val priority: String, val description: String)
 
+data class AiPlanResponse(val projectName: String?, val tasks: List<AiTask>)
+
 class AiPlannerViewModel(app: Application) : AndroidViewModel(app) {
 
     val messages     = MutableLiveData<List<ChatMessage>>(emptyList())
     val parsedTasks  = MutableLiveData<List<AiTask>>(emptyList())
+    val projectName  = MutableLiveData<String>("My Project")
     val isLoading    = MutableLiveData(false)
     val tasksCreated = MutableLiveData(false)
     val errorEvent   = MutableLiveData<String?>(null)
@@ -32,31 +35,34 @@ class AiPlannerViewModel(app: Application) : AndroidViewModel(app) {
     private val api   = GroqApiService.create()
     private val gson  = Gson()
 
-    private val history = mutableListOf(
-        GroqMessage(
-            role = "system",
-            content = """
-                You are FocusQuest AI, a productivity coach inside a focus and task management app.
-                Help users break down projects into actionable tasks.
+    private val systemMessage = GroqMessage(
+        role = "system",
+        content = """
+            You are FocusQuest AI, a productivity coach inside a focus and task management app.
+            Help users break down projects into actionable tasks.
 
-                Follow this STRICT two-phase process:
+            Follow this STRICT two-phase process:
 
-                PHASE 1 — When the user first describes a project, ask exactly 2 short numbered
-                clarifying questions about deadline, scope, priority level, or key constraints.
-                Do NOT generate tasks in Phase 1.
+            PHASE 1 — When the user first describes a project, ask exactly 2 short numbered
+            clarifying questions about deadline, scope, priority level, or key constraints.
+            Do NOT generate tasks in Phase 1.
 
-                PHASE 2 — After the user answers, write one brief summary sentence, then output
-                the task list in this EXACT format:
+            PHASE 2 — After the user answers, write one brief summary sentence, then output
+            the task list in this EXACT format:
 
-                ```json
-                {"tasks":[{"title":"Task title","priority":"HIGH","description":"One sentence description."}]}
-                ```
+            ```json
+            {
+              "projectName": "Short Project Name",
+              "tasks": [{"title":"Task title","priority":"HIGH","description":"One sentence description."}]
+            }
+            ```
 
-                Rules: 4-8 tasks, priority must be HIGH/MEDIUM/LOW, titles under 55 chars,
-                one-sentence descriptions, order tasks logically.
-            """.trimIndent()
-        )
+            Rules: 4-8 tasks, priority must be HIGH/MEDIUM/LOW, titles under 55 chars,
+            one-sentence descriptions, order tasks logically.
+        """.trimIndent()
     )
+
+    private val history = mutableListOf(systemMessage)
 
     fun sendMessage(text: String) {
         val trimmed = text.trim()
@@ -79,8 +85,8 @@ class AiPlannerViewModel(app: Application) : AndroidViewModel(app) {
 
                 history.add(GroqMessage("assistant", replyText))
 
-                val tasks = extractTasks(replyText)
-                val displayText = if (tasks.isNotEmpty()) {
+                val plan = extractPlan(replyText)
+                val displayText = if (plan != null && plan.tasks.isNotEmpty()) {
                     replyText.substringBefore("```json").trim()
                 } else {
                     replyText
@@ -90,7 +96,12 @@ class AiPlannerViewModel(app: Application) : AndroidViewModel(app) {
                 list.add(ChatMessage(displayText, isUser = false))
                 messages.value = list
 
-                if (tasks.isNotEmpty()) parsedTasks.value = tasks
+                plan?.let {
+                    if (it.tasks.isNotEmpty()) {
+                        parsedTasks.value = it.tasks
+                        it.projectName?.let { name -> projectName.value = name }
+                    }
+                }
 
             } catch (e: retrofit2.HttpException) {
                 val body = try { e.response()?.errorBody()?.string() } catch (_: Exception) { null }
@@ -135,7 +146,6 @@ class AiPlannerViewModel(app: Application) : AndroidViewModel(app) {
         throw lastEx!!
     }
 
-    // Keep system message + last 6 turns to limit token usage
     private fun trimmedHistory(): List<GroqMessage> {
         val system = history.take(1)
         val recent = history.drop(1).takeLast(6)
@@ -148,33 +158,33 @@ class AiPlannerViewModel(app: Application) : AndroidViewModel(app) {
         messages.value = list
     }
 
-    private fun extractTasks(text: String): List<AiTask> {
-        val match = Regex("```json\\s*(\\{[\\s\\S]*?\\})\\s*```").find(text) ?: return emptyList()
+    private fun extractPlan(text: String): AiPlanResponse? {
+        val match = Regex("```json\\s*(\\{[\\s\\S]*?\\})\\s*```").find(text) ?: return null
         val json = match.groupValues[1].trim()
         return try {
-            val type = object : TypeToken<Map<String, List<AiTask>>>() {}.type
-            val map: Map<String, List<AiTask>> = gson.fromJson(json, type)
-            map["tasks"] ?: emptyList()
+            gson.fromJson(json, AiPlanResponse::class.java)
         } catch (_: Exception) {
-            emptyList()
+            null
         }
     }
 
     fun createTasks() {
         val tasks = parsedTasks.value ?: return
+        val projName = projectName.value ?: "Project"
         val username = prefs.getCurrentUser()?.username ?: return
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                tasks.forEach { aiTask ->
+                tasks.forEachIndexed { index, aiTask ->
                     val priority = when (aiTask.priority.uppercase()) {
                         "HIGH" -> TaskEntity.PRIORITY_HIGH
                         "LOW"  -> TaskEntity.PRIORITY_LOW
                         else   -> TaskEntity.PRIORITY_MEDIUM
                     }
+                    val labeledTitle = "[$projName] ${index + 1}: ${aiTask.title}"
                     db.taskDao().insert(
                         TaskEntity(
                             username    = username,
-                            title       = aiTask.title,
+                            title       = labeledTitle,
                             description = aiTask.description,
                             category    = "Work",
                             priority    = priority,
@@ -185,6 +195,15 @@ class AiPlannerViewModel(app: Application) : AndroidViewModel(app) {
             }
             tasksCreated.postValue(true)
         }
+    }
+
+    fun resetSession() {
+        messages.value = emptyList()
+        parsedTasks.value = emptyList()
+        projectName.value = "My Project"
+        history.clear()
+        history.add(systemMessage)
+        tasksCreated.value = false
     }
 
     fun acknowledgeTasksCreated() { tasksCreated.value = false }

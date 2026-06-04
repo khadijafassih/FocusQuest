@@ -14,11 +14,13 @@ import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import com.example.focusquest.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var userPrefs: UserPreferencesManager
+    private val auth = FirebaseAuth.getInstance()
 
     private val systemReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -53,6 +55,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         userPrefs = UserPreferencesManager(this)
         setSupportActionBar(binding.toolbar)
+
+        // Ensure user is signed in to Firebase anonymously for Firestore access
+        if (auth.currentUser == null) {
+            auth.signInAnonymously()
+        }
 
         val toggle = ActionBarDrawerToggle(
             this, binding.drawerLayout, binding.toolbar,
@@ -101,6 +108,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_home    -> { binding.bottomNavigation.selectedItemId = R.id.nav_home }
             R.id.nav_tasks   -> { binding.bottomNavigation.selectedItemId = R.id.nav_tasks }
             R.id.nav_ai      -> { binding.bottomNavigation.selectedItemId = R.id.nav_ai }
+            R.id.nav_leaderboard -> { loadFragment(LeaderboardFragment()) }
             R.id.nav_timer   -> { binding.bottomNavigation.selectedItemId = R.id.nav_timer }
             R.id.nav_profile -> { binding.bottomNavigation.selectedItemId = R.id.nav_profile }
             R.id.nav_logout -> { logoutUser() }
@@ -112,6 +120,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun logoutUser() {
         userPrefs.logoutUser()
+        auth.signOut()
         startActivity(Intent(this, SignInActivity::class.java))
         finish()
     }

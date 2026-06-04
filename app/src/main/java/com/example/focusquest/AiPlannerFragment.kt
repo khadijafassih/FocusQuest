@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -58,6 +59,15 @@ class AiPlannerFragment : Fragment() {
             vm.clearPlan()
             binding.cardPlan.visibility = View.GONE
         }
+
+        binding.btnResetSession.setOnClickListener {
+            vm.resetSession()
+            Toast.makeText(context, "Session reset", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.etProjectName.addTextChangedListener {
+            vm.projectName.value = it?.toString() ?: ""
+        }
     }
 
     private fun sendMessage() {
@@ -78,10 +88,18 @@ class AiPlannerFragment : Fragment() {
             binding.btnSend.isEnabled = !loading
         }
 
+        vm.projectName.observe(viewLifecycleOwner) { name ->
+            if (binding.etProjectName.text.toString() != name) {
+                binding.etProjectName.setText(name)
+            }
+        }
+
         vm.parsedTasks.observe(viewLifecycleOwner) { tasks ->
             if (tasks.isNotEmpty()) {
                 binding.cardPlan.visibility = View.VISIBLE
                 binding.tvPlanSummary.text = buildPlanSummary(tasks)
+            } else {
+                binding.cardPlan.visibility = View.GONE
             }
         }
 

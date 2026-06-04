@@ -22,6 +22,8 @@ gson = "2.11.0"
 glide = "4.16.0"
 swiperefreshlayout = "1.1.0"
 mpandroidchart = "v3.1.0"
+googleServicesPlugin = "4.4.2"
+firebaseBom = "33.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -51,7 +53,14 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpandroidchart" }
 
+# Firebase (Using camelCase to avoid accessor generation issues)
+firebaseBom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebaseFirestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
+firebaseAuth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
+firebaseAnalytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+googleServices = { id = "com.google.gms.google-services", version.ref = "googleServicesPlugin" }

@@ -5,10 +5,11 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     id("kotlin-parcelize")
+    alias(libs.plugins.googleServices)
 }
 
-val localProperties = Properties().apply {
-    val f = rootProject.file("local.properties")
+val secretProperties = Properties().apply {
+    val f = rootProject.file("secret.properties")
     if (f.exists()) load(f.inputStream())
 }
 
@@ -23,7 +24,9 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "GROQ_API_KEY", "\"${localProperties["groq_api_key"] ?: ""}\"")
+        
+        // Groq API Key is now read from secret.properties
+        buildConfigField("String", "GROQ_API_KEY", "\"${secretProperties["groq_api_key"] ?: ""}\"")
     }
 
     buildTypes {
@@ -86,6 +89,12 @@ dependencies {
 
     // MPAndroidChart (stats charts)
     implementation(libs.mpandroidchart)
+
+    // Firebase
+    implementation(platform(libs.firebaseBom))
+    implementation(libs.firebaseFirestore)
+    implementation(libs.firebaseAuth)
+    implementation(libs.firebaseAnalytics)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

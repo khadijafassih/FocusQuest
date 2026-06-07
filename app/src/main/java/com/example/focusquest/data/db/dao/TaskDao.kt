@@ -3,6 +3,7 @@ package com.example.focusquest.data.db.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.focusquest.data.db.entity.TaskEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskDao {
@@ -21,6 +22,9 @@ interface TaskDao {
 
     @Query("SELECT COUNT(*) FROM tasks WHERE username = :username AND isCompleted = 1 AND completedAt >= :since")
     suspend fun countCompletedSince(username: String, since: Long): Int
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE username = :username AND isCompleted = 1 AND completedAt >= :since")
+    fun countCompletedSinceFlow(username: String, since: Long): Flow<Int>
 
     @Query("SELECT COUNT(*) FROM tasks WHERE username = :username AND isCompleted = 1")
     suspend fun countTotalCompleted(username: String): Int

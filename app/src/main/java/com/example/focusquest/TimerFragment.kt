@@ -146,11 +146,11 @@ class TimerFragment : Fragment() {
 
         vm.sessionCompleted.observe(viewLifecycleOwner) { done ->
             if (done) {
-                val type = vm.sessionType.value ?: return@observe
-                val isFocus = type != SessionType.SHORT_BREAK && type != SessionType.LONG_BREAK
+                val xp      = vm.lastXpEarned.value ?: 0
+                val isFocus = xp > 0
                 if (isFocus) {
-                    Toast.makeText(context, "Session complete! +${type.xp} XP earned!", Toast.LENGTH_LONG).show()
-                    sendNotification(type.xp)
+                    Toast.makeText(context, "Session complete! +$xp XP earned!", Toast.LENGTH_LONG).show()
+                    sendNotification(xp)
                     triggerHaptic()
                     binding.cardBreak.visibility = View.VISIBLE
                 } else {

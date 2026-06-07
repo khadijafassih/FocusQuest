@@ -2,6 +2,7 @@ package com.example.focusquest.data.repository
 
 import com.example.focusquest.data.db.dao.FocusSessionDao
 import com.example.focusquest.data.db.entity.FocusSessionEntity
+import kotlinx.coroutines.flow.Flow
 import java.util.Calendar
 
 class FocusRepository(private val dao: FocusSessionDao) {
@@ -15,6 +16,12 @@ class FocusRepository(private val dao: FocusSessionDao) {
 
     suspend fun todayFocusMinutes(username: String): Int =
         dao.sumFocusMinutesSince(username, startOfDay())
+
+    fun todayFocusSessionsFlow(username: String): Flow<Int> =
+        dao.countFocusSessionsSinceFlow(username, startOfDay())
+
+    fun todayFocusMinutesFlow(username: String): Flow<Int> =
+        dao.sumFocusMinutesSinceFlow(username, startOfDay())
 
     suspend fun totalSessions(username: String): Int =
         dao.countTotalFocusSessions(username)

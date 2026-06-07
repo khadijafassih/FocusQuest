@@ -46,6 +46,11 @@ class UserPreferencesManager(context: Context) {
         return false
     }
 
+    fun getAllUsers(): List<User> {
+        val usersJson = sharedPreferences.getString("all_users", "[]")
+        return gson.fromJson(usersJson, Array<User>::class.java).toList()
+    }
+
     /**
      * Get user by username
      */

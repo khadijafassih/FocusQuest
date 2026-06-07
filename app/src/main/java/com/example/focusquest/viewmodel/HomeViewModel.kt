@@ -11,6 +11,7 @@ import com.example.focusquest.data.repository.ContentRepository
 import com.example.focusquest.data.repository.FocusRepository
 import com.example.focusquest.data.repository.TaskRepository
 import com.example.focusquest.data.repository.WeatherData
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class HomeViewModel(app: Application) : AndroidViewModel(app) {
@@ -31,13 +32,13 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
     val isLoadingWeather = MutableLiveData(false)
 
     init {
+        observeTodayStats()
         loadAll()
     }
 
     fun loadAll() {
         loadQuote()
         loadWeather()
-        loadTodayStats()
     }
 
     fun loadQuote() {
@@ -63,12 +64,22 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun loadTodayStats() {
+    private fun observeTodayStats() {
+        val username = prefs.getCurrentUser()?.username ?: return
         viewModelScope.launch {
-            val username = prefs.getCurrentUser()?.username ?: return@launch
-            tasksDoneToday.value = taskRepo.countCompletedToday(username)
-            sessionsToday.value = focusRepo.todayFocusSessions(username)
-            focusMinutesToday.value = focusRepo.todayFocusMinutes(username)
+            taskRepo.countCompletedTodayFlow(username).collectLatest { count ->
+                tasksDoneToday.postValue(count)
+            }
+        }
+        viewModelScope.launch {
+            focusRepo.todayFocusSessionsFlow(username).collectLatest { count ->
+                sessionsToday.postValue(count)
+            }
+        }
+        viewModelScope.launch {
+            focusRepo.todayFocusMinutesFlow(username).collectLatest { minutes ->
+                focusMinutesToday.postValue(minutes)
+            }
         }
     }
 }

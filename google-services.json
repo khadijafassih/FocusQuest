@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1276550270",
+    "project_id": "focusquest-bd097",
+    "storage_bucket": "focusquest-bd097.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1276550270:android:bd53c898ecf2ba3d640c2f",
+        "android_client_info": {
+          "package_name": "com.example.focusquest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOWlhTp9QbPeAVmcGngI_BWXyZOPvxduI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

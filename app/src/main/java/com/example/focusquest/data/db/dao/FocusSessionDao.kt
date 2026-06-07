@@ -3,6 +3,7 @@ package com.example.focusquest.data.db.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.focusquest.data.db.entity.FocusSessionEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FocusSessionDao {
@@ -18,6 +19,12 @@ interface FocusSessionDao {
 
     @Query("SELECT IFNULL(SUM(durationMinutes), 0) FROM focus_sessions WHERE username = :username AND sessionType = 'FOCUS' AND completedAt >= :since")
     suspend fun sumFocusMinutesSince(username: String, since: Long): Int
+
+    @Query("SELECT COUNT(*) FROM focus_sessions WHERE username = :username AND sessionType = 'FOCUS' AND completedAt >= :since")
+    fun countFocusSessionsSinceFlow(username: String, since: Long): Flow<Int>
+
+    @Query("SELECT IFNULL(SUM(durationMinutes), 0) FROM focus_sessions WHERE username = :username AND sessionType = 'FOCUS' AND completedAt >= :since")
+    fun sumFocusMinutesSinceFlow(username: String, since: Long): Flow<Int>
 
     @Query("SELECT COUNT(*) FROM focus_sessions WHERE username = :username AND sessionType = 'FOCUS'")
     suspend fun countTotalFocusSessions(username: String): Int

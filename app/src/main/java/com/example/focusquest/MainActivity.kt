@@ -1,15 +1,20 @@
 package com.example.focusquest
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import com.example.focusquest.databinding.ActivityMainBinding
@@ -24,16 +29,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private val systemReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            val ctx = context ?: return
             when (intent?.action) {
-                Intent.ACTION_BATTERY_LOW ->
-                    Toast.makeText(context, "Battery low — save your work!", Toast.LENGTH_LONG).show()
-                Intent.ACTION_POWER_CONNECTED ->
-                    Toast.makeText(context, "Charging ⚡", Toast.LENGTH_SHORT).show()
-                Intent.ACTION_POWER_DISCONNECTED ->
-                    Toast.makeText(context, "Unplugged", Toast.LENGTH_SHORT).show()
+                Intent.ACTION_BATTERY_LOW         -> NotificationHelper.postBatteryLow(ctx)
+                Intent.ACTION_POWER_CONNECTED     -> NotificationHelper.postCharging(ctx)
+                Intent.ACTION_POWER_DISCONNECTED  -> NotificationHelper.postUnplugged(ctx)
                 Intent.ACTION_AIRPLANE_MODE_CHANGED -> {
                     val on = intent.getBooleanExtra("state", false)
-                    Toast.makeText(context, if (on) "Airplane mode on ✈️" else "Airplane mode off", Toast.LENGTH_SHORT).show()
+                    NotificationHelper.postAirplaneMode(ctx, on)
                 }
             }
         }
@@ -55,6 +58,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         userPrefs = UserPreferencesManager(this)
         setSupportActionBar(binding.toolbar)
+
+        requestNotificationPermissionIfNeeded()
 
         // Ensure user is signed in to Firebase anonymously for Firestore access
         if (auth.currentUser == null) {
@@ -132,6 +137,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             supportFragmentManager.popBackStack()
         } else {
             super.onBackPressed()
+        }
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    1001
+                )
+            }
         }
     }
 

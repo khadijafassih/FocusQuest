@@ -2,6 +2,7 @@ package com.example.focusquest.data.repository
 
 import com.example.focusquest.data.db.dao.TaskDao
 import com.example.focusquest.data.db.entity.TaskEntity
+import kotlinx.coroutines.flow.Flow
 import java.util.Calendar
 
 class TaskRepository(private val dao: TaskDao) {
@@ -18,6 +19,9 @@ class TaskRepository(private val dao: TaskDao) {
 
     suspend fun countCompletedToday(username: String): Int =
         dao.countCompletedSince(username, startOfDay())
+
+    fun countCompletedTodayFlow(username: String): Flow<Int> =
+        dao.countCompletedSinceFlow(username, startOfDay())
 
     suspend fun countTotalCompleted(username: String): Int =
         dao.countTotalCompleted(username)

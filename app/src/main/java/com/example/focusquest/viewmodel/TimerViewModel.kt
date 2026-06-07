@@ -13,7 +13,6 @@ import com.example.focusquest.AchievementManager
 import com.example.focusquest.TimerService
 import com.example.focusquest.UserPreferencesManager
 import com.example.focusquest.data.db.AppDatabase
-import com.example.focusquest.data.db.entity.FocusSessionEntity
 import com.example.focusquest.data.db.entity.TaskEntity
 import com.example.focusquest.data.repository.FocusRepository
 import kotlinx.coroutines.launch
@@ -34,12 +33,14 @@ class TimerViewModel(app: Application) : AndroidViewModel(app) {
     private val db = AppDatabase.getInstance(app)
     private val focusRepo = FocusRepository(db.focusSessionDao())
 
+
     val sessionType              = MutableLiveData(SessionType.POMODORO)
     val timerState               = MutableLiveData(TimerState.IDLE)
     val timeRemainingMs          = MutableLiveData(SessionType.POMODORO.minutes * 60_000L)
     val progressPercent          = MutableLiveData(0)
     val linkedTask               = MutableLiveData<TaskEntity?>(null)
     val sessionCompleted         = MutableLiveData(false)
+    val lastXpEarned             = MutableLiveData(0)
     val completedSessionsToday   = MutableLiveData(0)
     val newAchievements          = MutableLiveData<List<AchievementManager.AchievementDef>>(emptyList())
 
@@ -51,12 +52,13 @@ class TimerViewModel(app: Application) : AndroidViewModel(app) {
                 timeRemainingMs.postValue(ms)
                 progressPercent.postValue(pct)
             }
-            service!!.onFinish = { onServiceFinished() }
+            service!!.onFinish = { xp, achievements -> onServiceFinished(xp, achievements) }
             service!!.onStateChange = { state -> timerState.postValue(state) }
             // Restore UI state if service was already running
             sessionType.postValue(service!!.sessionType)
             timerState.postValue(service!!.timerState)
             timeRemainingMs.postValue(service!!.timeRemainingMs)
+            refreshTodayCount()
         }
 
         override fun onServiceDisconnected(name: ComponentName?) { service = null }
@@ -78,7 +80,11 @@ class TimerViewModel(app: Application) : AndroidViewModel(app) {
         progressPercent.value = 0
     }
 
-    fun setLinkedTask(task: TaskEntity?) { linkedTask.value = task }
+    fun setLinkedTask(task: TaskEntity?) {
+        linkedTask.value = task
+        service?.linkedTaskId    = task?.id
+        service?.linkedTaskTitle = task?.title
+    }
 
     fun toggleStartPause() = when (service?.timerState) {
         TimerState.IDLE, TimerState.PAUSED -> service?.startTimer()
@@ -98,32 +104,11 @@ class TimerViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setSound(name: String?) { service?.setSound(name) }
 
-    private fun onServiceFinished() {
-        val type = sessionType.value ?: return
-        val username = prefs.getCurrentUser()?.username ?: return
-        viewModelScope.launch {
-            val sType = when (type) {
-                SessionType.SHORT_BREAK -> FocusSessionEntity.TYPE_SHORT_BREAK
-                SessionType.LONG_BREAK  -> FocusSessionEntity.TYPE_LONG_BREAK
-                else                    -> FocusSessionEntity.TYPE_FOCUS
-            }
-            db.focusSessionDao().insert(
-                FocusSessionEntity(
-                    username = username,
-                    taskId = linkedTask.value?.id,
-                    taskTitle = linkedTask.value?.title,
-                    durationMinutes = prefs.getCustomDuration(type) ?: type.minutes,
-                    sessionType = sType
-                )
-            )
-            if (sType == FocusSessionEntity.TYPE_FOCUS) {
-                prefs.updateUserXP(type.xp)
-                refreshTodayCount()
-                val unlocked = AchievementManager.checkAndUnlock(username, db)
-                if (unlocked.isNotEmpty()) newAchievements.postValue(unlocked)
-            }
-            sessionCompleted.postValue(true)
-        }
+    private fun onServiceFinished(xpEarned: Int, achievements: List<AchievementManager.AchievementDef>) {
+        lastXpEarned.postValue(xpEarned)
+        if (achievements.isNotEmpty()) newAchievements.postValue(achievements)
+        refreshTodayCount()
+        sessionCompleted.postValue(true)
     }
 
     fun acknowledgeCompletion() { sessionCompleted.value = false }

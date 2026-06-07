@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,8 +15,7 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var userPrefs: UserPreferencesManager
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
-    private lateinit var progressBar: ProgressBar
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
@@ -33,8 +31,7 @@ class SignUpActivity : AppCompatActivity() {
         val btnSignUp = findViewById<Button>(R.id.btnSignUp)
         val tvSignIn = findViewById<TextView>(R.id.tvSignIn)
         val tvError = findViewById<TextView>(R.id.tvError)
-        progressBar = findViewById(R.id.progressBar) // Assuming you have one, or I'll add logic
-        
+
         btnSignUp.setOnClickListener {
             val username = etUsername.text.toString().trim()
             val email = etEmail.text.toString().trim()

@@ -11,8 +11,15 @@ import android.os.Build
 import android.os.CountDownTimer
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.example.focusquest.data.db.AppDatabase
+import com.example.focusquest.data.db.entity.FocusSessionEntity
 import com.example.focusquest.viewmodel.SessionType
 import com.example.focusquest.viewmodel.TimerState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TimerService : Service() {
 
@@ -34,9 +41,15 @@ class TimerService : Service() {
     var timeRemainingMs: Long    = SessionType.POMODORO.minutes * 60_000L; private set
     var totalMs: Long            = SessionType.POMODORO.minutes * 60_000L; private set
 
-    var onTick:        ((Long, Int) -> Unit)?  = null
-    var onFinish:      (() -> Unit)?           = null
-    var onStateChange: ((TimerState) -> Unit)? = null
+    var linkedTaskId:    Long?   = null
+    var linkedTaskTitle: String? = null
+
+    var onTick:        ((Long, Int) -> Unit)?                                              = null
+    var onFinish:      ((xpEarned: Int, achievements: List<AchievementManager.AchievementDef>) -> Unit)? = null
+    var onStateChange: ((TimerState) -> Unit)?                                             = null
+
+    private val serviceJob   = SupervisorJob()
+    private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
 
     private var timer:       CountDownTimer? = null
     private val soundPlayer  = SoundPlayer()
@@ -81,9 +94,9 @@ class TimerService : Service() {
                 timeRemainingMs = 0L
                 timerState = TimerState.FINISHED
                 onStateChange?.invoke(TimerState.FINISHED)
-                onFinish?.invoke()
                 soundPlayer.stop()
                 updateNotif(0L)
+                saveSession()
             }
         }.start()
         timerState = TimerState.RUNNING
@@ -160,5 +173,55 @@ class TimerService : Service() {
             .notify(NOTIF_ID, buildNotif(ms))
     }
 
-    override fun onDestroy() { timer?.cancel(); soundPlayer.stop(); super.onDestroy() }
+    private fun saveSession() {
+        val capturedType       = sessionType
+        val capturedTotalMs    = totalMs
+        val capturedTaskId     = linkedTaskId
+        val capturedTaskTitle  = linkedTaskTitle
+
+        serviceScope.launch {
+            val prefs    = UserPreferencesManager(this@TimerService)
+            val username = prefs.getCurrentUser()?.username
+            if (username == null) {
+                withContext(Dispatchers.Main) { onFinish?.invoke(0, emptyList()) }
+                return@launch
+            }
+
+            val sType = when (capturedType) {
+                SessionType.SHORT_BREAK -> FocusSessionEntity.TYPE_SHORT_BREAK
+                SessionType.LONG_BREAK  -> FocusSessionEntity.TYPE_LONG_BREAK
+                else                    -> FocusSessionEntity.TYPE_FOCUS
+            }
+
+            val db = AppDatabase.getInstance(this@TimerService)
+            db.focusSessionDao().insert(
+                FocusSessionEntity(
+                    username      = username,
+                    taskId        = capturedTaskId,
+                    taskTitle     = capturedTaskTitle,
+                    durationMinutes = (capturedTotalMs / 60_000L).toInt(),
+                    sessionType   = sType
+                )
+            )
+
+            var xpEarned    = 0
+            var achievements = emptyList<AchievementManager.AchievementDef>()
+            if (sType == FocusSessionEntity.TYPE_FOCUS) {
+                prefs.updateUserXP(capturedType.xp)
+                xpEarned     = capturedType.xp
+                achievements = AchievementManager.checkAndUnlock(username, db)
+            }
+
+            withContext(Dispatchers.Main) {
+                onFinish?.invoke(xpEarned, achievements)
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        timer?.cancel()
+        soundPlayer.stop()
+        serviceJob.cancel()
+        super.onDestroy()
+    }
 }

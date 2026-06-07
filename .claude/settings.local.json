@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(Get-ChildItem -Path \"D:\\\\UN\\\\MAD mid project\\\\FocusQuest\\\\app\\\\src\" -Recurse | Where-Object { $_.Extension -in '.kt', '.xml', '.gradle', '.json' } | Select-Object -ExpandProperty FullName)"
+      "PowerShell(Get-ChildItem -Path \"D:\\\\UN\\\\MAD mid project\\\\FocusQuest\\\\app\\\\src\" -Recurse | Where-Object { $_.Extension -in '.kt', '.xml', '.gradle', '.json' } | Select-Object -ExpandProperty FullName)",
+      "PowerShell(Remove-Item *)"
     ]
   }
 }

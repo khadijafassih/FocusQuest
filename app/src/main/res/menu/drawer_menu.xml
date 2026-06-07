@@ -10,6 +10,14 @@
             android:icon="@android:drawable/ic_menu_agenda"
             android:title="Tasks" />
         <item
+            android:id="@+id/nav_ai"
+            android:icon="@drawable/ic_ai_planner"
+            android:title="AI Task Planner" />
+        <item
+            android:id="@+id/nav_leaderboard"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="Leaderboard" />
+        <item
             android:id="@+id/nav_timer"
             android:icon="@android:drawable/ic_menu_recent_history"
             android:title="Timer" />
@@ -22,9 +30,9 @@
     <item android:title="Settings">
         <menu>
             <item
-                android:id="@+id/nav_reset"
-                android:icon="@android:drawable/ic_menu_delete"
-                android:title="Reset Data" />
+                android:id="@+id/nav_logout"
+                android:icon="@android:drawable/ic_menu_close_clear_cancel"
+                android:title="Logout" />
             <item
                 android:id="@+id/nav_about"
                 android:icon="@android:drawable/ic_menu_info_details"

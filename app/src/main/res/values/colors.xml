@@ -2,4 +2,48 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Primary -->
+    <color name="primary">#2563EB</color>
+    <color name="primary_dark">#1D4ED8</color>
+    <color name="primary_light">#DBEAFE</color>
+    <color name="on_primary">#FFFFFF</color>
+
+    <!-- Accent -->
+    <color name="accent_pink">#F45D8C</color>
+    <color name="accent_pink_light">#FFE4EF</color>
+
+    <!-- Semantic -->
+    <color name="success">#10B981</color>
+    <color name="success_light">#D1FAE5</color>
+    <color name="success_dark">#065F46</color>
+    <color name="warning">#F59E0B</color>
+    <color name="warning_light">#FEF3C7</color>
+    <color name="error">#EF4444</color>
+    <color name="error_light">#FEE2E2</color>
+
+    <!-- Background & Surface -->
+    <color name="screen_background">#F4F8FF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="card_stroke">#E2E8F5</color>
+
+    <!-- Text -->
+    <color name="text_primary">#111827</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="text_hint">#9CA3AF</color>
+
+    <!-- Navigation -->
+    <color name="bottom_nav_active">#2563EB</color>
+    <color name="bottom_nav_inactive">#94A3B8</color>
+    <color name="bottom_nav_active_bg">#EEF4FF</color>
+
+    <!-- Progress / XP -->
+    <color name="progress_fill">#F45D8C</color>
+    <color name="progress_track">#E2E8F5</color>
+    <color name="xp_chip_bg">#FFF0F6</color>
+
+    <!-- Task Priority -->
+    <color name="priority_high">#EF4444</color>
+    <color name="priority_medium">#F59E0B</color>
+    <color name="priority_low">#10B981</color>
 </resources>
